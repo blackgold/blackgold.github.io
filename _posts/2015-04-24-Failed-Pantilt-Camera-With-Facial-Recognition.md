@@ -9,7 +9,7 @@ When I run both the features symultaneously on threads the servo control goes ha
 The pi is not able to skedule the thread controlling the servo's at exact 20 millisecond intervals.
 Now its time to invest in a i2c servo controller.
 
-![pan titl camera]({{ site.url }}/images/pantiltcamera.jpg)
+![pan titl camera](../images/pantiltcamera.jpg)
 
 ---
 
