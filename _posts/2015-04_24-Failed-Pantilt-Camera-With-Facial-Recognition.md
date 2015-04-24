@@ -10,6 +10,6 @@ The pi is not able to skedule the thread controlling the servo's at exact 20 mil
 Now its time to invest in a i2c servo controller.
 
 img:
-    medium: ../images/pantiltcam.jpg
+    medium: pantiltcam.jpg
 ---
 
