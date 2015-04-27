@@ -1,7 +1,7 @@
 ---
 layout: page
 title: whoami
-permalink: /amout/
+permalink: /about/
 ---
 
 devendra ayalasomayajula
