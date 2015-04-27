@@ -1,11 +1,11 @@
 ---
 layout: page
 title: whoami
-permalink: /amout.md/
+permalink: /amout/
 ---
 
 devendra ayalasomayajula
 
 ### Contact me
 
-[email@domain.com](mailto:adevendra23@gmail.com)
+[adevendra23@gmail.com](mailto:adevendra23@gmail.com)
