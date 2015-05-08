@@ -7,6 +7,7 @@ Say you have list of CIDR's and want to check if given IP falls in the CIDR. Thi
 
 I have compared  SubnetVector class that does a linear lookup vs CidrMap class that uses hashmap for first level lookup and followed by binary trie.
 For a list of 7000 subnets I have seen CidrMap takes about 5 micro seconds and SubnetVector takes 200 micro seconds.
+For small list of CIDRs this doesnot make any difference.
 
 {% highlight c++ %}
 #include <iostream>
