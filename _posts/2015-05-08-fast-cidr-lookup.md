@@ -150,14 +150,13 @@ bool Trie::searchNode(nodePtr nd, const std::vector<char> &ip, int position) {
 
 class CidrMap {
   private:
-      std::tr1::unordered_map<int,Trie> m_map;
+      std::tr1::unordered_map<int,Trie> m_map; // use first 8 bits to see if the ip fallas in cidr or not
       public:
            bool put(std::string &subnet);
            bool put(in_addr_t prefix, int mask);
            bool get(std::string &ip);
            bool get(in_addr_t ip);
 };
-
 
 bool CidrMap::put( std::string &cidr) {
     std::string::size_type idx = cidr.find('/');
@@ -173,8 +172,8 @@ bool CidrMap::put( std::string &cidr) {
 
 bool CidrMap::put(in_addr_t prefix, int mask) {
   std::vector<char> subnet;
-  int l1Index=((prefix & 0xff000000)>>24)&0x000000ff;
-  prefix = prefix&0x00ffffff;
+  int l1Index=((prefix & 0xff000000)>>24)&0x000000ff; // first eight bits used as key in hash map, value is a trie 
+  prefix = prefix&0x00ffffff; // next 24 bits in trie
   prefix = prefix<<8;
   unsigned tmask = 0x800000;
   while(mask-- > 0) {
@@ -192,7 +191,7 @@ bool CidrMap::put(in_addr_t prefix, int mask) {
   if(m_map.find(l1Index) == m_map.end()) {
      Trie obj;
      obj.addSubnet(subnet);
-     m_map[l1Index] = obj;
+     m_map[l1Index] = obj; // <<- hash the first eight bits to Trie that holds next 24 bits
   }
   else {
     m_map[l1Index].addSubnet(subnet);
@@ -230,23 +229,28 @@ bool CidrMap::get(in_addr_t ip) {
      return m_map[l1Index].searchSubnet(ipv);
 }
 
-struct ydnsNetblock {
+
+/*
+ * Sample implementation for holding subnets in vector.
+ * Lookup is linear in time.
+ */
+struct Netblock {
     in_addr_t addr;
     in_addr_t mask;
 };
 
 class SubnetVector {
  private:
-   std::vector<ydnsNetblock> ydnsNetblockVec;
+   std::vector<Netblock> NetblockVec;
  public:
    void put(std::string subnet) {
        size_t idx = subnet.find('/');
        subnet[idx] = 0;
-       ydnsNetblock n;
+       Netblock n;
        if (inet_pton(AF_INET,subnet.c_str(),&n.addr) == 1) {
             if (inet_pton(AF_INET,subnet.c_str()+idx+1,&n.mask) == 1) {
                 n.addr &= n.mask;
-                ydnsNetblockVec.push_back(n);
+                NetblockVec.push_back(n);
             }
         }
    }
@@ -254,7 +258,7 @@ class SubnetVector {
    bool get(std::string &ip) {
         in_addr_t bip;
         inet_pton(AF_INET,ip.c_str(),&bip);
-        for (std::vector<ydnsNetblock>::iterator n = ydnsNetblockVec.begin(); n != ydnsNetblockVec.end(); ++n) {
+        for (std::vector<Netblock>::iterator n = NetblockVec.begin(); n != NetblockVec.end(); ++n) {
             if (match_mask(bip,n->addr, n->mask) )
                  return true;
         }
@@ -267,6 +271,10 @@ class SubnetVector {
     }
 };
 
+
+/*
+ * Helper functions to read cidr's/ip's  from files into vectors
+ */
 void fillCidr (std::vector<std::string> &cidrvec, std::string file) {
   std::ifstream infile(file.c_str());
   std::string cidr;
@@ -291,30 +299,46 @@ int main() {
   fillip(ipvec,"ip.txt");
 
   for(std::vector<std::string>::iterator itr = cidrvec.begin(); itr != cidrvec.end(); itr++) {
-      cmap.put(*itr);
-      cvec.put(*itr);
+      cmap.put(*itr); // fill the hashmap of tries
+      cvec.put(*itr); // fill the vector
   }
-
-  int errors=0;
+   
   for(std::vector<std::string>::iterator itr = ipvec.begin(); itr != ipvec.end(); itr++) {
       struct timeval b,e;
       unsigned long long t1,t2;
       bool m,v;
       gettimeofday (&b, NULL);
       t1 = b.tv_usec + (unsigned long long)b.tv_sec * 1000000;
-       m = cmap.get(*itr); 
+       m = cmap.get(*itr); // <- lookup in hashmap
       gettimeofday (&e, NULL);
       t2 = e.tv_usec + (unsigned long long)e.tv_sec * 1000000;
       std::cout << "[" << t2-t1 << "]  ";
       gettimeofday (&b, NULL);
       t1 = b.tv_usec + (unsigned long long)b.tv_sec * 1000000;
-       v = cvec.get(*itr);
+       v = cvec.get(*itr); // <- lookup in vector
       gettimeofday (&e, NULL);
       t2 = e.tv_usec + (unsigned long long)e.tv_sec * 1000000;
-      std::cout << "[" << t2-t1 << "]  [";
-      std:: cout <<  m << "]  [" << v << "]  " << *itr << std::endl;
+      std::cout << "[" << t2-t1 << "]  ";
+      //std:: cout <<  m << "]  [" << v << "]  " << *itr << std::endl;
   }
-  std::cout << ">>" << errors << "  " << ipvec.size() << std::endl;
 } 
+
+
+//sample file contains Subnet's
+203.127.225.0/24
+203.208.30.0/24
+202.175.244.0/24
+202.78.97.0/24
+
+//sample file containing IP's
+95.97.91.13
+95.97.93.12
+
+// sample output. First column is  time taken for trie lookup. second column is time taken for linear lookup. Time is in microseconds.
+[6]  [222]  
+[5]  [222]  
+[4]  [252]  
+[6]  [286]  
+[4]  [218]
 
 {% endhighlight %}
