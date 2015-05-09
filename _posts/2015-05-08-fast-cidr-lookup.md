@@ -5,9 +5,9 @@ title: Fast CIDR lookup
 
 Say you have list of CIDR's and want to check if given IP falls in the CIDR. This is useful for making fast routing decisions. 
 
-I have compared  SubnetVector class that does a linear lookup vs CidrMap class that uses hashmap for first level lookup and followed by binary trie.
-For a list of 7000 subnets I have seen CidrMap takes about 5 micro seconds and SubnetVector takes 200 micro seconds.
-For small list of CIDRs this doesnot make any difference.
+I have compared  SubnetVector class that does a linear lookup vs CidrMap class that uses hashmap for first level lookup and followed by binary trie. For a list of 7000 subnets I have seen CidrMap takes about 5 micro seconds and SubnetVector takes 200 micro seconds. For small list of CIDRs this doesnot make any difference. I guess it makes sense when we have tens of thousands of cids to lookup.
+
+Also SubnetVector has good cache property because of the vector. Need to research about the boost intrusive containers to improve the caching for CidrMap.
 
 {% highlight c++ %}
 #include <iostream>
