@@ -5,9 +5,16 @@ title: Fast CIDR lookup
 
 Say you have list of CIDR's and want to check if given IP falls in the CIDR. This is useful for making fast routing decisions. 
 
-I have compared  SubnetVector class that does a linear lookup vs CidrMap class that uses hashmap for first level lookup and followed by binary trie. For a list of 7000 subnets I have seen CidrMap takes about 5 micro seconds and SubnetVector takes 200 micro seconds. For small list of CIDRs this doesnot make any difference. I guess it makes sense when we have tens of thousands of cids to lookup.
+I looked at liner time algrithm and was amused at such a naive algorithm. The algorithm simply stored a struct of subnet and mask in a vector. Look up iterates though the vector and checks if the ip belongs to a subnet. This feels very inefficient.
 
-Also SubnetVector has good cache property because of the vector. Need to research about the boost intrusive containers to improve the caching for CidrMap.
+I decided to implement a fancy algorithm. Use first eight bits in the subnet as key into a hash map. Store the rest of the 24 bits ( to be precise 24 - [# bits in mask - 8] ) in a binary trie. The hash helps me to identify some of the mismatches in jst on lookup. Then in worst case of 24 comparisions the algorithm figures out if the ip falls in a subnet or not. I was about to implement compressing the common branches in trie but was tempted to test the performance inprovements.
+
+I have compared  SubnetVector class that does a linear lookup vs CidrMap class that uses hashmap for first level lookup and followed by binary trie. For a list of 7000 subnets I have seen CidrMap takes about 5 micro seconds for each lookup and SubnetVector took 200 micro seconds for each lookup. For a list of 500 CIDRs linear lookup took 20 micro seconds and CidrMap took 5 micro seconds. I guess it makes sense when we have tens of thousands of cidr's to lookup. I was disappointed. All this to save microseconds. 
+
+Conclusions:
+1. No need to over engineer.
+3. SubnetVector has good caching property because of the vector. 
+4. CidrMap has very bad caching. Not sure how to improve the caching property.But hey does it really make sense to cut chips off 6 micro seconds? 
 
 {% highlight c++ %}
 #include <iostream>
