@@ -19,6 +19,8 @@ As simple as the idea seems to be, there are various problems to be solved
 
 4. Need to setup a server that streams the camera feed. Xterm display is choppy.
 
+5. Checkout the video
+
 [![Experiment Video](http://img.youtube.com/vi/6wD5w_dazbs/0.jpg)](http://www.youtube.com/watch?v=6wD5w_dazbs)
 
 ---
