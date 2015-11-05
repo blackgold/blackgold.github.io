@@ -8,5 +8,5 @@ Later came codepad in 2008.
 
 [Proposal.pdf](../pdfs/compiler.pdf)
 
-[ancient slideshare][http://www.slideshare.net/rajivkumaar/online-compilerrajivcode-based-evaluation-recruitment]
+[ancient slideshare](http://www.slideshare.net/rajivkumaar/online-compilerrajivcode-based-evaluation-recruitment)
 ---
