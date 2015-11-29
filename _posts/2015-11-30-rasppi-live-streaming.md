@@ -71,7 +71,7 @@ raspivid -n -ih -t 0 -ISO 800 -ex night -w 200 -h 100 -fps 25 -b 2000000 -o - | 
 </html>
 ```
 
-3.3 Cgi Scripts that increment the angle of servo. The script simply reads the current value from pipe and writes back the new angle.
+3.3 Cgi Scripts that increment the angle of servo. The script simply reads the current value from pipe and writes back the new angle. File : /usr/lib/cgi-bin/plus.cgi
 
 ```
 <snippet>
@@ -146,7 +146,8 @@ int main () {
 </snippet>
 ```
 
-4. Now modify the router to open port 80 to outside world. umm.
+4. Now modify the router to open port 80 to outside world. umm. Reach the live feed on your phone at http://IP/live/index.html  
+To control servo use following http://IP/cgi-bin/plus.cgi  http://IP/cgi-bin/minus.cgi
 
 5. How to add motion detection to this?
 Maybe redirect the feed to opencv program that can read frame by frame and compute the diff. And if there is diff send an alert email?
