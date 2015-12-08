@@ -5,7 +5,7 @@ title: raspberry py live streaming
 
 I was going on a month long vacation and I wanted to monitor my appartment. Given I have pan tilt camera with facial recognition, I thought of implementing a live feed, control camera and add motion detection to it. Its been working for two months and not even a glitch. I just need to implement motion detection though. 
 
-1. checkout ffmpeg source and compile on raspberry pi. It will take overnight to compile, so run make and have a good nights sleep. You may get some missing library errors (libfaac-dev), you need to install them.
+Checkout ffmpeg source and compile on raspberry pi. It will take overnight to compile, so run make and have a good nights sleep. You may get some missing library errors (libfaac-dev), you need to install them.
 
 ```
  git clone git://source.ffmpeg.org/ffmpeg.git
@@ -15,16 +15,15 @@ I was going on a month long vacation and I wanted to monitor my appartment. Give
  sudo make install
 ```
 
-2. Following command captures the video and pipes the output to ffmpeg. Ffmpeg converts the source video to hls format and stores the fragments on disk and keeps updating the manifest file. ffmpeg also cleans up the old fragments
+Following command captures the video and pipes the output to ffmpeg. Ffmpeg converts the source video to hls format and stores the fragments on disk and keeps updating the manifest file. ffmpeg also cleans up the old fragments
 
 ```
 raspivid -n -ih -t 0 -ISO 800 -ex night -w 200 -h 100 -fps 25 -b 2000000 -o - | sudo ffmpeg -y  -i -  -c:v copy  -map 0  -f ssegment -segment_time 4 -segment_format mpegts -segment_list "/usr/share/nginx/www/live/stream.m3u8" -segment_list_size 10 -segment_wrap 20 -segment_list_flags +live -segment_list_type m3u8 "/usr/share/nginx/www/live/%03d.ts"
 ```
 
-3. Configure apache server to serve fragments from the disk. 
+Configure apache server to serve fragments from the disk. Contents of pache config file.
 
-3.1 Contents of pache config file.
-
+```
 <VirtualHost *:80>
         ServerAdmin webmaster@localhost
 
@@ -56,8 +55,9 @@ raspivid -n -ih -t 0 -ISO 800 -ex night -w 200 -h 100 -fps 25 -b 2000000 -o - | 
 
         CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
+```
 
-3.2 Following is the html index file
+Following is the html index file
 ```
 <html>
   <head>
@@ -71,10 +71,9 @@ raspivid -n -ih -t 0 -ISO 800 -ex night -w 200 -h 100 -fps 25 -b 2000000 -o - | 
 </html>
 ```
 
-3.3 Cgi Scripts that increment the angle of servo. The script simply reads the current value from pipe and writes back the new angle. File : /usr/lib/cgi-bin/plus.cgi
+Cgi Scripts that increment the angle of servo. The script simply reads the current value from pipe and writes back the new angle. File : /usr/lib/cgi-bin/plus.cgi
 
 ```
-<snippet>
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
@@ -95,13 +94,11 @@ mpipe.close()
 mpipe = open('/usr/share/nginx/www/live/pipe','w')
 mpipe.write(str(newangle))
 mpipe.close()
-</snippet>
 ```
 
-3.4 Following code reads from the pipe and controls the servo. please refer to my servo repo for more info.
+Following code reads from the pipe and controls the servo. please refer to my servo repo for more info.
 
 ```
-<snippet>
 #include "servo.h"
 #include <iostream>
 #include <stdio.h>
@@ -143,13 +140,12 @@ int main () {
       sleep(1);
    }
 } 
-</snippet>
 ```
 
-4. Now modify the router to open port 80 to outside world. umm. Reach the live feed on your phone at http://IP/live/index.html  
-To control servo use following http://IP/cgi-bin/plus.cgi  http://IP/cgi-bin/minus.cgi
+Now modify the router to open port 80 to outside world. umm. Reach the live feed on your phone at http://IP/live/index.html To control servo use following http://IP/cgi-bin/plus.cgi  http://IP/cgi-bin/minus.cgi
 
-5. How to add motion detection to this?
+
+How to add motion detection to this?
 Maybe redirect the feed to opencv program that can read frame by frame and compute the diff. And if there is diff send an alert email?
 
 ---
