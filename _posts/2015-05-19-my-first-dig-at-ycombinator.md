@@ -7,7 +7,7 @@ It all started when I visited a restaurant and liked it so much that I wanted to
 Also always show one days worth of reviews. As a user I want to know how customers are liking the place today ..now.(hypothesis 2)
 It is also good for businesses because they can focus on how they want to do today .. tomorrow not worrying about one of review thats stuck on the website for ever. (hypothesis three).
 I am working on putting my hypothesis to test. Will write up a blog publishing my results soon.
-
+Checkout the server and app in my repos(digelpapp/digelpserver)
 [![Demo Video](http://img.youtube.com/vi/oQO7ivdxfxw/0.jpg)](http://www.youtube.com/watch?v=oQO7ivdxfxw)
 
 ---
